@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>お買い物登録アプリ</title>
+</head>
+<style>
+    body {
+        margin: 20px;
+        background-color: #fff;
+        font-family: Arial, sans-serif;
+    }
+
+    header, section, form {
+        margin-bottom: 20px;
+    }
+
+    h1, h2 {
+        text-align: center;
+        font-size: 24px;
+        color: #333;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: #fff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    th, td {
+        font-size: 16px;
+        padding: 15px;
+        text-align: center;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+
+    ul, dl {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    li {
+        margin-bottom: 15px;
+        font-size: 16px;
+        color: #555;
+        background-color: #fff;
+        padding: 10px;
+        border-radius: 5px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    dt {
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #333;
+    }
+
+    dd {
+        color: #555;
+        margin-bottom: 10px;
+    }
+
+    form label {
+        display: block;
+        margin-bottom: 8px;
+        color: #555;
+    }
+
+    form input, select {
+        padding: 10px;
+        width: 100%;
+        margin-bottom: 15px;
+        box-sizing: border-box;
+    }
+
+    form button {
+        padding: 12px;
+        background-color: #4caf50;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+    }
+
+    form button:hover {
+        background-color: red;
+    }
+
+    .delete-button {
+        display: inline;
+        margin-left: 10px;
+    }
+</style>
+</head>
+
+<body>
+    <h1 class="mb-4">お買い物登録帳</h1>
+    <section>
+        <h2>購入したい商品</h2>
+        <form action="/addProduct" method="post">
+            <label for="productName">商品名：</label>
+            <input type="text" id="productName" name="商品名" required>
+            <label for="productPrice">値段：</label>
+            <input type="number" id="productPrice" name="値段" required>
+            <label for="productDescription">説明：</label>
+            <input type="text" id="productDescription" name="説明" required>
+            <label for="categoryName">カテゴリー名：</label>
+            <select id="categoryName" name="カテゴリー名" required>
+                <% for (const category of categoryItems) { %>
+                <option value="<%= category.category_name %>"><%= category.category_name %></option>
+                <% } %>
+            </select>
+            <button type="submit">追加</button>
+        </form>
+    </section>
+
+   
+    <section>
+        <header>
+            <h2>未購入商品</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>商品名</th>
+                        <th>値段</th>
+                        <th>説明</th>
+                        <th>カテゴリー名</th>
+                        <th>選択</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% for (const product of productItems) { %>
+                        <% if (!product.purchased) { %>
+                            <tr>
+                                <td><%= product.商品名 %></td>
+                                <td><%= product.値段 %> 円</td>
+                                <td><%= product.説明 %></td>
+                                <td><%= product.カテゴリー名%></td>
+                                <td>
+                                    <form action="/buyProduct" method="post">
+                                        <input type="hidden" name="商品名" value="<%= product.商品名 %>">
+                                        <button type="submit">購入</button>
+                                    </form>
+                                    <form action="/deleteProduct" method="post">
+                                        <input type="hidden" name="商品名" value="<%= product.商品名 %>">
+                                        <button type="submit">削除</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <% } %>
+                    <% } %>
+                </tbody>
+            </table>
+        </header>
+    </section>
+    
+   
+    
+    
+    <section>
+        <h2>購入済み商品</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>商品名</th>
+                    <th>値段</th>
+                    <th>説明</th>
+                    <th>カテゴリー名</th>
+                    <th>選択</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% for (const product of purchasedProductItems) { %>
+                    <tr>
+                        <td><%= product.商品名 %></td>
+                        <td><%= product.値段 %> 円</td>
+                        <td><%= product.説明 %></td>
+                        <td><%= product.カテゴリー名 %></td>
+                        <td>
+                            <form action="/cancelPurchase" method="post">
+                                <input type="hidden" name="商品名" value="<%= product.商品名 %>">
+                                <button type="submit">取り消し</button>
+                            </form>
+                        </td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </section>
+   
+        <h2>カテゴリー名の追加</h2>
+        <form action="/addCategory" method="post">
+            <label for="categoryName">カテゴリー名：</label>
+            <input type="text" id="categoryName" name="category_name" required>
+            <button type="submit">追加</button>
+        </form>
+    </section>
+   
+    <section>  
+        <h2>カテゴリー名の削除</h2>
+        <form action="/deleteCategory" method="post">
+            <label for="deleteCategory">カテゴリー名：</label>
+            <select id="deleteCategory" name="category_name" required>
+                <% for (const category of categoryItems) { %>
+                <option value="<%= category.category_name %>"><%= category.category_name %></option>
+                <% } %>
+            </select>
+            <button type="submit">削除</button>
+        </form>
+    </section>
+ 
+   
+     
+    
+                
+
+</html>
